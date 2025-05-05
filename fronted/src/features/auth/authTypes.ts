@@ -5,4 +5,10 @@ export interface User {
     phone:string;
 }
 
+export type userInfo = {
+    name:string,
+    email:string,
+    _id:string
+};
+
 export type SignInInput = Pick<User, 'email' | 'password'>;
