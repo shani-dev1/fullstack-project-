@@ -3,8 +3,10 @@ import { TextField, Button, Typography, Paper, Snackbar, Alert, Link } from '@mu
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpSchema, signInSchema } from './AuthSchema';
-import type { SignInInput, User } from './authTypes';
+import type { SignInInput, User, userInfo } from './authTypes';
 import { useCreateUserMutation, useSignInMutation } from './authAPI';
+import { setCookie } from 'typescript-cookie';
+import { jwtDecode } from "jwt-decode";
 
 const AuthForm = () => {
   const [createUser] = useCreateUserMutation();
@@ -27,14 +29,21 @@ const AuthForm = () => {
 
   const onSubmit: SubmitHandler<User | SignInInput> = async (data: User | SignInInput) => {
     try {
-      
+      let response: { token: string } | undefined;
+
       if (isSignUp) {
-        await createUser(data).unwrap();
+        response = await createUser(data).unwrap();
       } else {
         const { email, password } = data as SignInInput;
-        await signIn({ email, password }).unwrap();
+        response = await signIn({ email, password }).unwrap();
       }
 
+      const token: string | undefined = response?.token;
+      if (!token) throw new Error("Token is undefined");
+
+      setCookie('token', token, { expires: 1, path: '/' });
+      const decoded = jwtDecode<userInfo>(token);
+      console.log("Decoded:", decoded);
       setOpenSnackbar(true);
       isSignUp ? signUpForm.reset() : signInForm.reset();
     } catch (error: any) {
