@@ -7,8 +7,11 @@ import type { SignInInput, User, userInfo } from './authTypes';
 import { useCreateUserMutation, useSignInMutation } from './authAPI';
 import { setCookie } from 'typescript-cookie';
 import { jwtDecode } from "jwt-decode";
+import { useDispatch } from 'react-redux';
+import { setUser } from './currentUserSlice';
 
 const AuthForm = () => {
+  const dispatch = useDispatch();
   const [createUser] = useCreateUserMutation();
   const [signIn] = useSignInMutation();
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn');
@@ -44,6 +47,9 @@ const AuthForm = () => {
       setCookie('token', token, { expires: 1, path: '/' });
       const decoded = jwtDecode<userInfo>(token);
       console.log("Decoded:", decoded);
+
+      dispatch(setUser(decoded));
+
       setOpenSnackbar(true);
       isSignUp ? signUpForm.reset() : signInForm.reset();
     } catch (error: any) {
