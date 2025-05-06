@@ -2,7 +2,9 @@ import { createBrowserRouter } from "react-router";
 import Home from "../pages/Home";
 import AppLayout from "../components/AppLayout";
 import Footer from "../components/Footer";
+import CompetitionList from "../features/competitions/CompetitionList";
 import About from "../pages/About";
+
 const router = createBrowserRouter([
     {
         element: <AppLayout/>, 
@@ -11,11 +13,11 @@ const router = createBrowserRouter([
                 index: true,
                 element: <Home/>                
             },
-
+            { path: "competitions/:competitionID", element: <CompetitionList/> },
             { path: "about", element: <About /> },
             { path: "contact", element: <Footer /> },
         ]
     }  
 ]);
 
-export default router
+export default router;

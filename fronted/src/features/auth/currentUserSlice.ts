@@ -24,5 +24,5 @@ const authUserSlice = createSlice({
 });
 
 export const { setUser, clearUser } = authUserSlice.actions;
-export const selectCurrentUser = (state: RootState) => state.currentUser.user;
+export const selectCurrentUser = (state: RootState) => state.authUser.user;
 export default authUserSlice.reducer;
