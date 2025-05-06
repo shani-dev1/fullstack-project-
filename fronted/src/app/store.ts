@@ -1,16 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
+import competition from '../features/competitions/competitionsStateSlice';
 import authAPI from '../features/auth/authAPI';
-import currentUserSlice from "../features/auth/currentUserSlice";
+import authUserReducer from "../features/auth/currentUserSlice";
+import competitionDemo from '../features/competitions/competitionsAPI';
 
 const store = configureStore({
   reducer: {
+    competition,
+    authUser: authUserReducer,
     [authAPI.reducerPath]: authAPI.reducer,
-    currentUser: currentUserSlice,
-
+    [competitionDemo.reducerPath]: competitionDemo.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
-      .concat(authAPI.middleware)
+    getDefaultMiddleware().concat(authAPI.middleware, competitionDemo.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

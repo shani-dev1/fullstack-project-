@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes'); 
 const authRoutes = require('./routes/authRoutes'); 
+const competitionRoutes=require('./routes/competitions')
 const dotenv = require('dotenv'); 
 const cors = require('cors'); 
 const app = express();
@@ -18,6 +19,7 @@ mongoose.connect(process.env.CONECTION_URL)
 
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/competitions', competitionRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
