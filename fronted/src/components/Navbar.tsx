@@ -1,13 +1,24 @@
 import { NavLink } from 'react-router';
 import { useState } from 'react';
 import {
-  AppBar,Toolbar,Box,Button,Dialog,DialogTitle,DialogContent,IconButton,
+  AppBar,
+  Toolbar,
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useSelector } from 'react-redux';
 
 import AuthForm from '../features/auth/AuthForm';
+import { selectCurrentUser } from '../features/auth/currentUserSlice';
+import UserMenu from '../components/UserMenue';
 
 const Navbar = () => {
+  const user = useSelector(selectCurrentUser);
   const [openLogin, setOpenLogin] = useState(false);
 
   return (
@@ -32,6 +43,7 @@ const Navbar = () => {
               About
             </Button>
           </Box>
+          {!user ? (
             <Button
               color="inherit"
               onClick={() => setOpenLogin(true)}
@@ -39,6 +51,9 @@ const Navbar = () => {
             >
               Login
             </Button>
+          ) : (
+            <UserMenu />
+          )}
         </Toolbar>
       </AppBar>
       <Toolbar />

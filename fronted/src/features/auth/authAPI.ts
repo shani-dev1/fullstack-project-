@@ -17,12 +17,20 @@ const authAPI = apiSlice.injectEndpoints({
         body: credentials,
       }),
     }),
+    deleteUser: builder.mutation({
+      query: (userId) => ({
+        url: `/users/${userId}`,
+        method: "DELETE",
+      }),
+    }),
+
   }),
 });
 
 export const {
   useCreateUserMutation,
   useSignInMutation,
+  useDeleteUserMutation
 } = authAPI;
 
 export default authAPI;
