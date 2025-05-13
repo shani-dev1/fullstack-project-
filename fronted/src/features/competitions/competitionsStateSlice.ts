@@ -15,17 +15,14 @@ const competitionsSlice = createSlice({
   name: "competition",
   initialState,
   reducers: {
-    show: (state: CompetitionsState) => {
-      alert(state.val);
-    },
     chooseCompetition: (state, action: { payload: CategoryKeys }) => {
       state.currentCompetition = action.payload;
     },
   },
 });
 
-export const { show, chooseCompetition } = competitionsSlice.actions;
+export const { chooseCompetition } = competitionsSlice.actions;
 export const selectCurrentCompetition = (state: { competition: CompetitionsState }) =>
-  state.competition.currentCompetition;
+state.competition.currentCompetition;
 
 export default competitionsSlice.reducer;

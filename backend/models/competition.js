@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const competitionSchema = new mongoose.Schema({
     ownerId: {
-        type: Number,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
     },
     category: {
         type: String,
@@ -16,7 +16,7 @@ const competitionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    file: {
+    fileUrl: {
         type: String,
         required: true
     },  

@@ -4,7 +4,7 @@ import { getCookie } from "typescript-cookie";
 const authSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5050/api",
+    baseUrl: "http://localhost:3500/api",
     prepareHeaders: (headers) => {
       const token = getCookie("token");
       if (token) {
