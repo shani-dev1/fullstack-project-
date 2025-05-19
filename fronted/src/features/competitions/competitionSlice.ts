@@ -1,12 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const competitionDemo = createApi({
+const competitionSlice = createApi({
   reducerPath: "api/competitions", 
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5050/api/competitions'
+    baseUrl: 'http://localhost:3500/api/competitions'
   }),
   tagTypes: ["Competition"], 
   endpoints: (builder) => ({}) 
 });
 
-export default competitionDemo;
+export default competitionSlice;

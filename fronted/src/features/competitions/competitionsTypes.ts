@@ -2,7 +2,7 @@ export interface CompetitionItem {
   _id:string
   category: string;
   score: number;
-  file: string;
+  fileUrl: string;
   ownerId: Number;
   ownerEmail: string;
 }
