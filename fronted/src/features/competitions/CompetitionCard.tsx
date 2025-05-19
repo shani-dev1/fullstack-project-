@@ -1,8 +1,23 @@
 import { useState } from "react";
-import {Card,CardContent,CardMedia,Typography,Snackbar,Alert} from "@mui/material";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Snackbar,
+  Alert,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from "@mui/material";
 import { Rate, Tag } from "antd";
 import { CompetitionItem } from "./competitionsTypes";
-import { useUpdateCompetitionRatingMutation } from "./competitionsAPI";
+import {
+  useUpdateCompetitionRatingMutation,
+  useDeleteCompetitionMutation
+} from "./competitionsAPI";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../auth/currentUserSlice";
 
@@ -13,11 +28,16 @@ interface Props {
 const CompetitionCard = ({ competitionItem }: Props) => {
   const [value, setValue] = useState<number | null>(null);
   const [updateCompetitionRating] = useUpdateCompetitionRatingMutation();
+  const [deleteCompetition] = useDeleteCompetitionMutation();
   const currentUser = useSelector(selectCurrentUser);
 
-  const [openSnackbar, setOpenSnackbar] = useState (false);
-  const [snackbarMessage, setSnackbarMessage] = useState ("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState <"success" | "warning" | "error">("success");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "warning" | "error"
+  >("success");
+
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleRatingChange = async (newValue: number) => {
     if (!currentUser) {
@@ -33,13 +53,14 @@ const CompetitionCard = ({ competitionItem }: Props) => {
       setOpenSnackbar(true);
       return;
     }
+
     setValue(newValue);
 
     try {
       await updateCompetitionRating({
         competitionId: competitionItem._id,
         rating: newValue,
-        userId: currentUser._id
+        userId: currentUser._id,
       }).unwrap();
 
       setSnackbarMessage("הדירוג עודכן בהצלחה");
@@ -55,7 +76,22 @@ const CompetitionCard = ({ competitionItem }: Props) => {
         setSnackbarMessage("שגיאה בעדכון הדירוג. אנא נסה שוב מאוחר יותר.");
         setSnackbarSeverity("error");
       }
+
       setOpenSnackbar(true);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteCompetition(competitionItem._id).unwrap();
+      setSnackbarMessage("התחרות נמחקה בהצלחה");
+      setSnackbarSeverity("success");
+    } catch (error) {
+      setSnackbarMessage("שגיאה במחיקת התחרות");
+      setSnackbarSeverity("error");
+    } finally {
+      setOpenSnackbar(true);
+      setOpenDialog(false);
     }
   };
 
@@ -68,7 +104,7 @@ const CompetitionCard = ({ competitionItem }: Props) => {
           overflow: "hidden",
           background: "#1f1f1f",
           border: "1px solid #ffc107",
-          boxShadow: "0 6px 24px rgba(0,0,0,0.4)"
+          boxShadow: "0 6px 24px rgba(0,0,0,0.4)",
         }}
       >
         <CardMedia
@@ -77,7 +113,7 @@ const CompetitionCard = ({ competitionItem }: Props) => {
           image={competitionItem.fileUrl}
           style={{
             height: 200,
-            objectFit: "cover"
+            objectFit: "cover",
           }}
         />
         <CardContent>
@@ -86,14 +122,13 @@ const CompetitionCard = ({ competitionItem }: Props) => {
             style={{
               color: "#ffc107",
               fontWeight: "bold",
-              fontSize: "18px"
+              fontSize: "18px",
             }}
           >
             קטגוריה: {competitionItem.category}
           </Typography>
           <Typography
             variant="body2"
-            color="textSecondary"
             style={{ color: "#ccc", fontSize: "14px" }}
           >
             הועלה על ידי: {competitionItem.ownerEmail}
@@ -109,7 +144,7 @@ const CompetitionCard = ({ competitionItem }: Props) => {
               backgroundColor: "#2a2a2a",
               padding: "8px 12px",
               borderRadius: "8px",
-              display: "inline-block"
+              display: "inline-block",
             }}
           >
             <Rate
@@ -118,12 +153,42 @@ const CompetitionCard = ({ competitionItem }: Props) => {
               onChange={handleRatingChange}
               style={{
                 color: "#ffca28",
-                fontSize: 24
+                fontSize: 24,
               }}
             />
           </div>
+
+          {currentUser?._id === competitionItem.ownerId && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setOpenDialog(true)}
+              style={{ marginTop: 16 }}
+              fullWidth
+            >
+              מחק תחרות
+            </Button>
+          )}
         </CardContent>
       </Card>
+
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+      >
+        <DialogTitle>אישור מחיקה</DialogTitle>
+        <DialogContent>
+          האם אתה בטוח שברצונך למחוק את התחרות? פעולה זו בלתי הפיכה.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">
+            ביטול
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error">
+            מחק
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={openSnackbar}
