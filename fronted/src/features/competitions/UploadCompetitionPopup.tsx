@@ -11,6 +11,7 @@ import {
   Typography,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useCreateCompetitionMutation } from "./competitionsAPI";
@@ -22,51 +23,53 @@ interface Props {
 
 const UploadCompetitionPopup = ({ onClose, onSuccess }: Props) => {
   const { competitionID } = useParams();
-  const [uploadCompetition] = useCreateCompetitionMutation();
+  const [uploadCompetition, { isLoading }] = useCreateCompetitionMutation();
   const currentUser = useSelector(selectCurrentUser);
 
-  const [formData] = useState({
-    category: competitionID || "pictures",
-  });
   const [file, setFile] = useState<File | null>(null);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       setFile(e.target.files[0]);
       setErrorMessage("");
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file) {
-      setErrorMessage("בחר תמונה");
-      return;
-    }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!file) {
+    setErrorMessage("בחר תמונה");
+    return;
+  }
 
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) =>
-      data.append(key, value)
-    );
-    data.append("image", file);
-    data.append("ownerId", currentUser?._id || "");
-    data.append("ownerEmail", currentUser?.email || "");
+  if (!currentUser || !currentUser._id || !currentUser.email) {
+    setErrorMessage("שגיאה: המשתמש לא מחובר.");
+    return;
+  }
 
-    try {
-      await uploadCompetition(data).unwrap();
-      setOpenSnackbar(true);
-      onSuccess();
-    } catch (err) {
-      console.error(err);
-      setErrorMessage("שגיאה בהעלאה");
-    }
-  };
+  const data = new FormData();
+  data.append("category", competitionID || "pictures");
+  data.append("image", file);
+  data.append("ownerId", currentUser._id); 
+  data.append("ownerEmail", currentUser.email);
+
+  try {
+    await uploadCompetition(data).unwrap();
+    setOpenSnackbar(true);
+    onSuccess();
+    setFile(null);
+  } catch (err) {
+    console.error(err);
+    setErrorMessage("שגיאה בהעלאה");
+  }
+};
+
 
   return (
     <>
-      <Dialog open={true} onClose={onClose} fullWidth maxWidth="sm">
+      <Dialog open onClose={onClose} fullWidth maxWidth="sm">
         <DialogTitle
           sx={{
             backgroundColor: "#2d2d2d",
@@ -111,41 +114,40 @@ const UploadCompetitionPopup = ({ onClose, onSuccess }: Props) => {
               component="label"
               htmlFor="file-upload"
               sx={{
-                display: "block",
-                backgroundColor: "#555",
+                display: "inline-block",
+                backgroundColor: file ? "#777" : "#555",
                 color: "#fff",
-                padding: "12px",
+                padding: "12px 24px",
                 borderRadius: "10px",
                 textAlign: "center",
                 border: "2px dashed #ffca28",
-                cursor: "pointer",
-                marginBottom: 2,
+                cursor: file ? "not-allowed" : "pointer",
+                transition: "0.3s",
+                fontWeight: "bold",
+                fontSize: "16px",
               }}
             >
-              לחץ לבחירת קובץ
+              {file ? "✓ קובץ נבחר" : "לחץ לבחירת קובץ"}
               <input
                 id="file-upload"
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
+                disabled={!!file}
                 style={{ display: "none" }}
               />
             </Box>
 
             {file && (
-              <Typography sx={{ color: "#ccc", fontSize: "14px" }}>
+              <Typography
+                sx={{ color: "#ccc", fontSize: "14px", mt: 1 }}
+              >
                 {file.name}
               </Typography>
             )}
 
             {errorMessage && (
-              <Typography
-                sx={{
-                  color: "red",
-                  marginTop: 2,
-                  fontSize: "14px",
-                }}
-              >
+              <Typography sx={{ color: "red", mt: 2, fontSize: "14px" }}>
                 {errorMessage}
               </Typography>
             )}
@@ -170,7 +172,7 @@ const UploadCompetitionPopup = ({ onClose, onSuccess }: Props) => {
           <Button
             onClick={handleSubmit}
             variant="contained"
-            color="primary"
+            disabled={isLoading || !file}
             sx={{
               textTransform: "none",
               backgroundColor: "#ffca28",
@@ -180,7 +182,7 @@ const UploadCompetitionPopup = ({ onClose, onSuccess }: Props) => {
               "&:hover": { backgroundColor: "#ffb300" },
             }}
           >
-            שלח
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : "שלח"}
           </Button>
         </DialogActions>
       </Dialog>

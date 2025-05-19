@@ -3,7 +3,7 @@ export interface CompetitionItem {
   category: string;
   rating: number;
   fileUrl: string;
-  ownerId: Number;
+  ownerId: string;
   ownerEmail: string;
 }
 
