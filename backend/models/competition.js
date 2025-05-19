@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const competitionSchema = new mongoose.Schema({
     ownerId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -19,10 +20,15 @@ const competitionSchema = new mongoose.Schema({
     fileUrl: {
         type: String,
         required: true
+    },
+    publicId: {
+        type: String,
+        required: true
     },  
-        ratedBy: {
+    ratedBy: {
         type: [mongoose.Schema.Types.ObjectId],
         default: []
     }
 });
+
 module.exports = mongoose.model('Competition', competitionSchema);
