@@ -1,6 +1,6 @@
-import competitionDemo from "./competitionSlice";
+import competitionSlice from "./competitionSlice";
 
-const competitionsAPI = competitionDemo.injectEndpoints({
+const competitionsAPI = competitionSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCompetitionByCategory: builder.query({
       query: (category) => `/${category}`,
@@ -15,12 +15,22 @@ const competitionsAPI = competitionDemo.injectEndpoints({
       }),
       invalidatesTags: ["Competition"],
     }),
+
+     updateCompetitionRating: builder.mutation({
+      query: ({ competitionId, rating , userId}) => ({
+        url: `/update/${competitionId}`,
+        method: "PUT",
+        body: { rating , userId},
+      }),
+      invalidatesTags: ["Competition"],
+    }),
   }),
 });
 
 export const {
   useGetCompetitionByCategoryQuery,
   useCreateCompetitionMutation,
+  useUpdateCompetitionRatingMutation,
 } = competitionsAPI;
 
 export default competitionsAPI;
