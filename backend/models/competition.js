@@ -20,5 +20,9 @@ const competitionSchema = new mongoose.Schema({
         type: String,
         required: true
     },  
+        ratedBy: {
+        type: [mongoose.Schema.Types.ObjectId],
+        default: []
+    }
 });
 module.exports = mongoose.model('Competition', competitionSchema);

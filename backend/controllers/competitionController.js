@@ -44,8 +44,8 @@ exports.createCompetition = async (req, res) => {
 
 exports.updateRating = async (req, res) => {
   const { competitionId } = req.params;
-  const { rating } = req.body;
-
+  const { rating,userId } = req.body;
+  
   try {
     const competition = await Competition.findById(competitionId);
     if (!competition) {
@@ -53,6 +53,12 @@ exports.updateRating = async (req, res) => {
     }
 
     competition.rating += rating;
+    if (competition.ratedBy.includes(userId)) {
+      return res.status(400).json({ message: 'User has already rated this competition' });
+    }
+
+    competition.rating += rating;
+    competition.ratedBy.push(userId);
     await competition.save(); 
 
     res.status(200).json({ message: 'Score updated successfully', competition });
@@ -61,4 +67,3 @@ exports.updateRating = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-

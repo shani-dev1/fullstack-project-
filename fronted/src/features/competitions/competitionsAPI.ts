@@ -17,10 +17,10 @@ const competitionsAPI = competitionSlice.injectEndpoints({
     }),
 
      updateCompetitionRating: builder.mutation({
-      query: ({ competitionId, rating }) => ({
+      query: ({ competitionId, rating , userId}) => ({
         url: `/update/${competitionId}`,
         method: "PUT",
-        body: { rating },
+        body: { rating , userId},
       }),
       invalidatesTags: ["Competition"],
     }),
@@ -31,7 +31,6 @@ export const {
   useGetCompetitionByCategoryQuery,
   useCreateCompetitionMutation,
   useUpdateCompetitionRatingMutation,
-
 } = competitionsAPI;
 
 export default competitionsAPI;

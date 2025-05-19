@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Card, CardContent, CardMedia, Typography, Snackbar, Alert } from "@mui/material";
-import { Rate, Tag } from "antd"; 
+import {Card,CardContent,CardMedia,Typography,Snackbar,Alert} from "@mui/material";
+import { Rate, Tag } from "antd";
 import { CompetitionItem } from "./competitionsTypes";
-import { useUpdateCompetitionRatingMutation } from './competitionsAPI';
-import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '../auth/currentUserSlice';
+import { useUpdateCompetitionRatingMutation } from "./competitionsAPI";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../auth/currentUserSlice";
 
 interface Props {
   competitionItem: CompetitionItem;
@@ -14,33 +14,47 @@ const CompetitionCard = ({ competitionItem }: Props) => {
   const [value, setValue] = useState<number | null>(null);
   const [updateCompetitionRating] = useUpdateCompetitionRatingMutation();
   const currentUser = useSelector(selectCurrentUser);
-  
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'warning' | 'error'>('success');
+
+  const [openSnackbar, setOpenSnackbar] = useState (false);
+  const [snackbarMessage, setSnackbarMessage] = useState ("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState <"success" | "warning" | "error">("success");
 
   const handleRatingChange = async (newValue: number) => {
     if (!currentUser) {
-      setSnackbarMessage('עליך להתחבר כדי לדרג');
-      setSnackbarSeverity('warning');
+      setSnackbarMessage("עליך להתחבר כדי לדרג");
+      setSnackbarSeverity("warning");
       setOpenSnackbar(true);
       return;
     }
 
     if (currentUser._id === competitionItem.ownerId) {
-      setSnackbarMessage('בעל התחרות לא יכול לדרג את עצמו');
-      setSnackbarSeverity('warning');
+      setSnackbarMessage("בעל התחרות לא יכול לדרג את עצמו");
+      setSnackbarSeverity("warning");
       setOpenSnackbar(true);
       return;
     }
-
     setValue(newValue);
+
     try {
-      await updateCompetitionRating({ competitionId: competitionItem._id, rating: newValue });
-    } catch (error) {
-      console.error('Error updating rating:', error);
-      setSnackbarMessage('שגיאה בעדכון הדירוג. אנא נסה שוב מאוחר יותר.');
-      setSnackbarSeverity('error');
+      await updateCompetitionRating({
+        competitionId: competitionItem._id,
+        rating: newValue,
+        userId: currentUser._id
+      }).unwrap();
+
+      setSnackbarMessage("הדירוג עודכן בהצלחה");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || "שגיאה בעדכון הדירוג";
+
+      if (errorMessage === "User has already rated this competition") {
+        setSnackbarMessage("כבר דירגת את התחרות הזו. לא ניתן לדרג פעמיים.");
+        setSnackbarSeverity("warning");
+      } else {
+        setSnackbarMessage("שגיאה בעדכון הדירוג. אנא נסה שוב מאוחר יותר.");
+        setSnackbarSeverity("error");
+      }
       setOpenSnackbar(true);
     }
   };
@@ -54,7 +68,7 @@ const CompetitionCard = ({ competitionItem }: Props) => {
           overflow: "hidden",
           background: "#1f1f1f",
           border: "1px solid #ffc107",
-          boxShadow: "0 6px 24px rgba(0,0,0,0.4)",
+          boxShadow: "0 6px 24px rgba(0,0,0,0.4)"
         }}
       >
         <CardMedia
@@ -63,14 +77,25 @@ const CompetitionCard = ({ competitionItem }: Props) => {
           image={competitionItem.fileUrl}
           style={{
             height: 200,
-            objectFit: "cover",
+            objectFit: "cover"
           }}
         />
         <CardContent>
-          <Typography variant="h6" style={{ color: "#ffc107", fontWeight: "bold", fontSize: "18px" }}>
+          <Typography
+            variant="h6"
+            style={{
+              color: "#ffc107",
+              fontWeight: "bold",
+              fontSize: "18px"
+            }}
+          >
             קטגוריה: {competitionItem.category}
           </Typography>
-          <Typography variant="body2" color="textSecondary" style={{ color: "#ccc", fontSize: "14px" }}>
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            style={{ color: "#ccc", fontSize: "14px" }}
+          >
             הועלה על ידי: {competitionItem.ownerEmail}
           </Typography>
           <br />
@@ -84,7 +109,7 @@ const CompetitionCard = ({ competitionItem }: Props) => {
               backgroundColor: "#2a2a2a",
               padding: "8px 12px",
               borderRadius: "8px",
-              display: "inline-block",
+              display: "inline-block"
             }}
           >
             <Rate
@@ -93,15 +118,23 @@ const CompetitionCard = ({ competitionItem }: Props) => {
               onChange={handleRatingChange}
               style={{
                 color: "#ffca28",
-                fontSize: 24,
+                fontSize: 24
               }}
             />
           </div>
         </CardContent>
       </Card>
 
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
-        <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
