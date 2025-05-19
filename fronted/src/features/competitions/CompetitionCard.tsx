@@ -1,84 +1,81 @@
-import React, { useState } from "react";
-import { Card, Rate, Tag, Typography } from "antd";
+import { useState } from "react";
 import { CompetitionItem } from "./competitionsTypes";
-
-const { Meta } = Card;
-const { Text } = Typography;
 
 interface Props {
   competitionItem: CompetitionItem;
 }
-
 const CompetitionCard = ({ competitionItem }: Props) => {
   const [value, setValue] = useState<number | null>(null);
+  const [isRated, setIsRated] = useState(false); // מצב חדש כדי לבדוק אם הציון שונה
 
   const handleRatingChange = (newValue: number) => {
-    setValue(newValue);
+    if (!isRated) { 
+      setValue(newValue);
+      setIsRated(true); // עדכון המצב לדירוג
+    }
   };
 
   return (
-    <Card
-      hoverable
+    <div
       style={{
-        width: 320,
+        width: 300,
+        backgroundColor: "#1f1f1f",
+        color: "#fff",
         borderRadius: 16,
         overflow: "hidden",
-        background: "#1f1f1f",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
         border: "1px solid #ffc107",
-        boxShadow: "0 6px 24px rgba(0,0,0,0.4)",
+        transition: "transform 0.3s",
       }}
-      cover={
+    >
+      <div style={{ position: "relative" }}>
         <img
-          alt="תמונה לתחרות"
           src={competitionItem.fileUrl}
+          alt="תמונה לתחרות"
           style={{
+            width: "100%",
             height: 200,
             objectFit: "cover",
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
           }}
         />
-      }
-    >
-      <Meta
-        title={
-          <div style={{ color: "#ffc107", fontWeight: "bold", fontSize: "18px" }}>
-            קטגוריה: {competitionItem.category}
-          </div>
-        }
-        description={
-          <div>
-            <Text type="secondary" style={{ color: "#ccc", fontSize: "14px" }}>
-              הועלה על ידי: {competitionItem.ownerEmail}
-            </Text>
-            <br />
-            <Tag color="gold" style={{ marginTop: 8, fontSize: 14 }}>
-              ציון: {competitionItem.score}
-            </Tag>
+      </div>
 
-            <div
+      <div style={{ padding: 16 }}>
+        <div
+          style={{
+            fontWeight: "bold",
+            fontSize: "18px",
+            color: "#ffc107",
+            marginBottom: 4,
+          }}
+        >
+          קטגוריה: {competitionItem.category}
+        </div>
+        <div style={{ fontSize: "14px", color: "#ccc" }}>
+          הועלה על ידי: {competitionItem.ownerEmail}
+        </div>
+        <div style={{ fontSize: "16px", marginTop: 8, color: "#ffeb3b" }}>
+          ציון: {value !== null ? value : competitionItem.score}
+        </div>
+
+        <div style={{ marginTop: 12 }}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              onClick={() => handleRatingChange(star)}
               style={{
-                marginTop: 12,
-                backgroundColor: "#2a2a2a",
-                padding: "8px 12px",
-                borderRadius: "8px",
-                display: "inline-block",
+                cursor: isRated ? "not-allowed" : "pointer", 
+                fontSize: 20,
+                marginRight: 4,
+                color: value && value >= star ? "#ff9800" : "#777",
               }}
             >
-              <Rate
-                allowClear
-                value={value ?? competitionItem.score ?? 0}
-                onChange={handleRatingChange}
-                style={{
-                  color: "#ffca28",
-                  fontSize: 24,
-                }}
-              />
-            </div>
-          </div>
-        }
-      />
-    </Card>
+              ★
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 
