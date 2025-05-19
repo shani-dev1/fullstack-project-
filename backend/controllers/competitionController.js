@@ -1,4 +1,5 @@
 const Competition = require('../models/competition');
+const { cloudinary } = require('../config/cloudinary');
 
 exports.getCompetitionsByCategory = async (req, res) => {
   const { category } = req.params;
@@ -24,12 +25,16 @@ exports.createCompetition = async (req, res) => {
       return res.status(400).json({ message: 'Image upload failed' });
     }
 
+    const fileUrl = req.file.path;
+    const publicId = getPublicIdFromUrl(fileUrl); 
+
     const newCompetition = new Competition({
       ownerId,
       category,
       rating: 0,
       ownerEmail,
-      fileUrl: req.file.path
+      fileUrl,
+      publicId 
     });
 
     await newCompetition.save();
@@ -42,6 +47,26 @@ exports.createCompetition = async (req, res) => {
   }
 };
 
+const getPublicIdFromUrl = (fileUrl) => {
+  try {
+    const url = new URL(fileUrl);
+    const pathParts = url.pathname.split('/');
+    const uploadIndex = pathParts.findIndex(p => p === 'upload');
+    const publicIdWithExt = pathParts.slice(uploadIndex + 1).join('/');
+
+    const partsWithoutVersion = publicIdWithExt.split('/');
+    const versionPart = partsWithoutVersion[0]; 
+    const rest = partsWithoutVersion.slice(1).join('/');
+    const withoutExtension = rest.replace(/\.[^/.]+$/, '')
+
+    return withoutExtension;
+  } catch (err) {
+    console.error('Failed to extract public_id from URL:', err.message);
+    return null;
+  }
+};
+
+
 exports.updateRating = async (req, res) => {
   const { competitionId } = req.params;
   const { rating,userId } = req.body;
@@ -52,7 +77,6 @@ exports.updateRating = async (req, res) => {
       return res.status(404).json({ message: 'Competition not found' });
     }
 
-    competition.rating += rating;
     if (competition.ratedBy.includes(userId)) {
       return res.status(400).json({ message: 'User has already rated this competition' });
     }
@@ -64,6 +88,33 @@ exports.updateRating = async (req, res) => {
     res.status(200).json({ message: 'Score updated successfully', competition });
   } catch (error) {
     console.error('Error updating score:', error.message);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.deleteCompetition = async (req, res) => {
+  const { competitionId } = req.params;
+
+  try {
+    const competition = await Competition.findById(competitionId);
+    
+    if (!competition) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+
+    const { publicId } = competition;
+    if (publicId) {
+      const result = await cloudinary.uploader.destroy(publicId);
+      console.log('Cloudinary delete result:', result);
+    } else {
+      console.warn('No publicId found for competition:', competitionId);
+    }
+
+    await Competition.findByIdAndDelete(competitionId);
+
+    res.status(200).json({ message: 'Competition and image deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting competition:', error.message);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
