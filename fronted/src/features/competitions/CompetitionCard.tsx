@@ -53,7 +53,7 @@ const CompetitionCard = ({ competitionItem }: Props) => {
             </Text>
             <br />
             <Tag color="gold" style={{ marginTop: 8, fontSize: 14 }}>
-              ציון: {competitionItem.score}
+              ציון: {competitionItem.rating}
             </Tag>
 
             <div
@@ -67,7 +67,7 @@ const CompetitionCard = ({ competitionItem }: Props) => {
             >
               <Rate
                 allowClear
-                value={value ?? competitionItem.score ?? 0}
+                value={value ?? competitionItem.rating ?? 0}
                 onChange={handleRatingChange}
                 style={{
                   color: "#ffca28",

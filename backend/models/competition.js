@@ -8,7 +8,7 @@ const competitionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    score: {
+    rating: {
         type: Number,
         required: true
     },

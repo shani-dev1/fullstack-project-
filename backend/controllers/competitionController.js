@@ -27,7 +27,7 @@ exports.createCompetition = async (req, res) => {
     const newCompetition = new Competition({
       ownerId,
       category,
-      score: 0,
+      rating: 0,
       ownerEmail,
       fileUrl: req.file.path
     });
