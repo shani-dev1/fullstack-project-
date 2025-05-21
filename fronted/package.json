@@ -14,9 +14,10 @@
     "@emotion/styled": "^11.14.0",
     "@hookform/resolvers": "^5.0.1",
     "@mui/icons-material": "^7.0.2",
-    "@mui/material": "^7.0.2",
+    "@mui/material": "^7.1.0",
     "@reduxjs/toolkit": "^2.7.0",
-    "antd": "^4.24.16",
+    "antd": "^5.25.2",
+    "framer-motion": "^12.11.0",
     "jwt-decode": "^4.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -37,6 +38,6 @@
     "globals": "^16.0.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
-    "vite": "^6.3.5"
+    "vite": "^6.3.1"
   }
 }
