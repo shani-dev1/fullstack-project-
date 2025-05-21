@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { selectCurrentUser } from "../auth/currentUserSlice";
+import { selectCurrentUser } from "../../auth/currentUserSlice";
 import {
   Dialog,
   DialogActions,
@@ -14,7 +14,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useCreateCompetitionMutation } from "./competitionsAPI";
+import { useCreateCompetitionMutation } from "../competitionsAPI";
 
 interface Props {
   onClose: () => void;

@@ -1,7 +1,7 @@
 const Competition = require('../models/competition');
 const { cloudinary } = require('../config/cloudinary');
 
-exports.getCompetitionsByCategory = async (req, res) => {
+exports.getCompetitionsByCategory = async (req, res) => {  
   const { category } = req.params;
   
   if (!category) {
@@ -118,3 +118,20 @@ exports.deleteCompetition = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+exports.getLeadCompetitionsByCategory = async (req, res) => {
+  const { category } = req.params;
+
+  try {
+    const topCompetitions = await Competition.find({ category })
+      .sort({ rating: -1 })
+      .limit(3)
+      .select("fileUrl ownerEmail rating");
+
+    res.status(200).json(topCompetitions);
+  } catch (error) {
+    console.error("Error fetching top competitions:", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+

@@ -5,7 +5,7 @@ const competitionSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:3500/api/competitions'
   }),
-  tagTypes: ["Competition"], 
+  tagTypes: ["Competition" , "TopCompetitions"], 
   endpoints: (builder) => ({}) 
 });
 
