@@ -135,3 +135,15 @@ exports.getLeadCompetitionsByCategory = async (req, res) => {
   }
 };
 
+exports.getUserCompetitionsByUserId = async (req, res) => {
+    const { userId } = req.params;
+    
+    try {
+        const userCompetitions = await Competition.find({ ownerId: userId })
+        res.status(200).json(userCompetitions);
+
+    } catch (error) {
+        console.error("Error fetching user competitions:", error.message);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+}
