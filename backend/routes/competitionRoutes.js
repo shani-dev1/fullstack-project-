@@ -11,6 +11,6 @@ router.post("/", upload.single("image"), createCompetition);
 router.put("/update/:competitionId", updateRating);
 router.delete("/:competitionId", deleteCompetition);
 router.get('/top/:category', getLeadCompetitionsByCategory);
-router.get('/:UserId',getUserCompetitionsByUserId)
+router.get('/UserCompetitions/:userId',getUserCompetitionsByUserId)
 
 module.exports = router;

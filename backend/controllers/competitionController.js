@@ -137,8 +137,9 @@ exports.getLeadCompetitionsByCategory = async (req, res) => {
 
 exports.getUserCompetitionsByUserId = async (req, res) => {
     const { userId } = req.params;
+    
     try {
-        const userCompetitions = await Competition.find({ userId })
+        const userCompetitions = await Competition.find({ ownerId: userId })
         res.status(200).json(userCompetitions);
 
     } catch (error) {
