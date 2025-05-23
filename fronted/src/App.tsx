@@ -4,7 +4,7 @@ import './App.css';
 import { Provider } from 'react-redux';
 import store from './app/store';
 
-function App() {  
+function App() {
   return (
     <RouterProvider router={router} />
   );

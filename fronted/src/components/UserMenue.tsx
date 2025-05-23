@@ -36,11 +36,6 @@ const UserMenu = () => {
 
   const handleMenuClose = () => setAnchorEl(null);
 
-  const handleLogout = () => {
-    dispatch(clearUser());
-    handleMenuClose();
-  };
-
   const handleDeleteAccount = () => {
     setOpenDeleteDialog(true);
     handleMenuClose();
@@ -82,11 +77,6 @@ const UserMenu = () => {
         <MenuItem onClick={handleMyCompetitions}>
           <Typography variant="body2">התחרויות שלי</Typography>
         </MenuItem>
-
-        <MenuItem onClick={handleLogout}>
-          <Typography variant="body2">התנתק</Typography>
-        </MenuItem>
-        <Divider sx={{ my: 1 }} />
 
         <MenuItem onClick={handleDeleteAccount} sx={{ color: 'error.main' }}>
           <Typography variant="body2">מחק חשבון</Typography>
