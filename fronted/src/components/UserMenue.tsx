@@ -1,12 +1,23 @@
 import { useState } from 'react';
-import { Typography, Divider, Button, DialogTitle, Avatar, Menu, MenuItem, Dialog, DialogActions } from '@mui/material';
+import {
+  Typography,
+  Divider,
+  Button,
+  DialogTitle,
+  Avatar,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogActions,
+} from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeCookie, getCookie } from 'typescript-cookie';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import { selectCurrentUser, clearUser } from '../features/auth/currentUserSlice';
 import { useDeleteUserMutation } from '../features/auth/authAPI';
 import { userInfo } from '../features/auth/authTypes';
+import UserCompetitions from '../features/competitions/components/userCompetitions';  
 
 const UserMenu = () => {
   const dispatch = useDispatch();
@@ -15,6 +26,8 @@ const UserMenu = () => {
   const menuOpen = Boolean(anchorEl);
   const [deleteUser] = useDeleteUserMutation();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+  const [openCompetitionsDialog, setOpenCompetitionsDialog] = useState(false);
 
   if (!user) return null;
 
@@ -37,6 +50,11 @@ const UserMenu = () => {
     handleMenuClose();
   };
 
+  const handleMyCompetitions = () => {
+    setOpenCompetitionsDialog(true);
+    handleMenuClose();
+  };
+
   const confirmDeleteAccount = async () => {
     try {
       const token = getCookie('token');
@@ -56,6 +74,7 @@ const UserMenu = () => {
       <Avatar onClick={handleAvatarClick} sx={{ cursor: 'pointer' }}>
         {firstLetter}
       </Avatar>
+
       <Menu
         anchorEl={anchorEl}
         open={menuOpen}
@@ -67,19 +86,43 @@ const UserMenu = () => {
           <Typography variant="subtitle2">שלום, {user.name}</Typography>
         </MenuItem>
         <Divider sx={{ my: 1 }} />
+
+        <MenuItem onClick={handleMyCompetitions}>
+          <Typography variant="body2">התחרויות שלי</Typography>
+        </MenuItem>
+
         <MenuItem onClick={handleLogout}>
           <Typography variant="body2">התנתק</Typography>
         </MenuItem>
         <Divider sx={{ my: 1 }} />
+
         <MenuItem onClick={handleDeleteAccount} sx={{ color: 'error.main' }}>
           <Typography variant="body2">מחק חשבון</Typography>
         </MenuItem>
       </Menu>
+
+      {/* דיאלוג הצגת תחרויות */}
+      <Dialog
+        open={openCompetitionsDialog}
+        onClose={() => setOpenCompetitionsDialog(false)}
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle>התחרויות שלי</DialogTitle>
+        <UserCompetitions userId={user._id} />
+        <DialogActions>
+          <Button onClick={() => setOpenCompetitionsDialog(false)} color="primary">
+            סגור
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* דיאלוג אישור מחיקת חשבון */}
       <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
         <DialogTitle>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <WarningAmberIcon color="warning" />
-            <Typography variant="h6" component="span" style={{ marginLeft: '8px' }}>
+            <Typography variant="h6" component="span" style={{ marginLeft: 8 }}>
               אישור מחיקת חשבון
             </Typography>
           </div>
