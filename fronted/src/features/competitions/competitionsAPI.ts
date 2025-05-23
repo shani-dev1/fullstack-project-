@@ -38,6 +38,11 @@ const competitionsAPI = competitionSlice.injectEndpoints({
         { type: "TopCompetitions", id: category },
       ],
     }),
+
+    getUserCompetitionsByUserId: builder.query<CompetitionItem[], string>({
+      query: (userId) => `/UserCompetitions/${userId}`,
+      providesTags: (_result, _error, userId) => [{ type: "Competition", id: userId }],
+    }),
   }),
 })
 
@@ -46,6 +51,7 @@ export const {
   useGetLeadCompetitionsByCategoryQuery,
   useCreateCompetitionMutation,
   useUpdateCompetitionRatingMutation,
+  useGetUserCompetitionsByUserIdQuery,
 } = competitionsAPI;
 
 export default competitionsAPI;

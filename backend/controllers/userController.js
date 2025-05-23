@@ -30,7 +30,7 @@ exports.addUser = async (req, res) => {
 
       const token = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET);
       console.log('Generated Access Token:', token);
-      return res.status(200).json({ token, message: 'User created successfully' });
+      return res.status(200).json({ token, userInfo, message: 'User created successfully' });
 
     } else {
       return res.status(400).json({ message: 'Invalid user received' });
