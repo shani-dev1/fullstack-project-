@@ -31,11 +31,7 @@ const AuthForm = () => {
 
   const onSubmit: SubmitHandler<User | SignInInput> = async (data: User | SignInInput) => {
     try {
-<<<<<<< HEAD
       let response: { token: string , userInfo:userInfo} | undefined;
-=======
-      let response: { token: string , userInfo: userInfo} | undefined;
->>>>>>> 1f1e626179c7e8af09727a823d2d9a3339a96eee
 
       if (isSignUp) {
         response = await createUser(data).unwrap();
