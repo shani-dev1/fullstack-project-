@@ -12,11 +12,8 @@ import {
 } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeCookie, getCookie } from 'typescript-cookie';
-import {jwtDecode} from 'jwt-decode';
 import { selectCurrentUser, clearUser } from '../features/auth/currentUserSlice';
 import { useDeleteUserMutation } from '../features/auth/authAPI';
-import { userInfo } from '../features/auth/authTypes';
 import UserCompetitions from '../features/competitions/components/userCompetitions';  
 
 const UserMenu = () => {
@@ -40,7 +37,6 @@ const UserMenu = () => {
   const handleMenuClose = () => setAnchorEl(null);
 
   const handleLogout = () => {
-    removeCookie('token');
     dispatch(clearUser());
     handleMenuClose();
   };
@@ -57,11 +53,7 @@ const UserMenu = () => {
 
   const confirmDeleteAccount = async () => {
     try {
-      const token = getCookie('token');
-      if (!token) throw new Error('User not authenticated');
-      const decoded = jwtDecode<userInfo>(token);
-      await deleteUser(decoded._id).unwrap();
-      removeCookie('token');
+      await deleteUser(user._id).unwrap();
       dispatch(clearUser());
     } catch (err) {
       console.error(err);

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { userInfo } from "./authTypes";
 import { RootState } from '../../app/store';
+import { removeCookie } from 'typescript-cookie';
 
 interface AuthState {
   user: userInfo | null;
@@ -18,6 +19,7 @@ const authUserSlice = createSlice({
       state.user = action.payload;
     },
     clearUser(state) {
+      removeCookie('token');
       state.user = null;
     },
   },

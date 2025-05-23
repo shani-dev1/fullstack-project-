@@ -6,7 +6,6 @@ import { signUpSchema, signInSchema } from './AuthSchema';
 import type { SignInInput, User, userInfo } from './authTypes';
 import { useCreateUserMutation, useSignInMutation } from './authAPI';
 import { setCookie } from 'typescript-cookie';
-import { jwtDecode } from "jwt-decode";
 import { useDispatch } from 'react-redux';
 import { setUser } from './currentUserSlice';
 
@@ -32,7 +31,7 @@ const AuthForm = () => {
 
   const onSubmit: SubmitHandler<User | SignInInput> = async (data: User | SignInInput) => {
     try {
-      let response: { token: string } | undefined;
+      let response: { token: string , userInfo:userInfo} | undefined;
 
       if (isSignUp) {
         response = await createUser(data).unwrap();
@@ -45,11 +44,9 @@ const AuthForm = () => {
       if (!token) throw new Error("Token is undefined");
 
       setCookie('token', token, { expires: 1, path: '/' });
-      const decoded = jwtDecode<userInfo>(token);
-      console.log("Decoded:", decoded);
-
-      dispatch(setUser(decoded));
-
+      if (response?.userInfo) {
+        dispatch(setUser(response.userInfo));
+      }
       setOpenSnackbar(true);
       isSignUp ? signUpForm.reset() : signInForm.reset();
     } catch (error: any) {
