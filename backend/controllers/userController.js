@@ -18,7 +18,7 @@ exports.addUser = async (req, res) => {
     }
 
     const hashedPwd = await bcrypt.hash(password, 10);
-    const userObject = { _id, name, email, phone, password: hashedPwd };
+    const userObject = { _id, name, email, phone,password: hashedPwd,rooms: [] };
     const user = await User.create(userObject);
 
     if (user) {
