@@ -1,5 +1,6 @@
 const Competition = require('../models/competition');
 const { cloudinary } = require('../config/cloudinary');
+const User = require('../models/users');
 
 exports.getCompetitionsByCategory = async (req, res) => {  
   const { category } = req.params;
@@ -38,7 +39,8 @@ exports.createCompetition = async (req, res) => {
     });
 
     await newCompetition.save();
-    
+
+    await User.findByIdAndUpdate(ownerId, { $addToSet: { rooms: category } });    
     res.status(201).json({ message: 'Competition created successfully', competition: newCompetition });
 
   } catch (error) {
@@ -46,6 +48,7 @@ exports.createCompetition = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 const getPublicIdFromUrl = (fileUrl) => {
   try {

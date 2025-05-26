@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const UsersSchema = new mongoose.Schema({
     name: {
@@ -18,6 +18,10 @@ const UsersSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-})
+    rooms: {
+        type: [String],
+        default: []
+    }
+});
 
-module.exports = mongoose.model('users', UsersSchema)
+module.exports = mongoose.model('users', UsersSchema);
