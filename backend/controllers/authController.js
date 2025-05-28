@@ -19,9 +19,10 @@ exports.signIn = async (req, res) => {
         }
 
         const userInfo = {
-            name: "name",
+            name: "name"+foundUser.email,
             email: foundUser.email,
-            _id: foundUser._id
+            _id: foundUser._id,
+            rooms: foundUser.rooms || [],
         };
 
         const token = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET);
