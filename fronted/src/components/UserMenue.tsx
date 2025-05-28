@@ -14,7 +14,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, clearUser } from '../features/auth/currentUserSlice';
 import { useDeleteUserMutation } from '../features/auth/authAPI';
-import UserCompetitions from '../features/competitions/components/userCompetitions';  
+import UserCompetitions from '../features/competitions/components/userCompetitions';
 
 const UserMenu = () => {
   const dispatch = useDispatch();
@@ -23,7 +23,6 @@ const UserMenu = () => {
   const menuOpen = Boolean(anchorEl);
   const [deleteUser] = useDeleteUserMutation();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-
   const [openCompetitionsDialog, setOpenCompetitionsDialog] = useState(false);
 
   if (!user) return null;
@@ -35,6 +34,11 @@ const UserMenu = () => {
   };
 
   const handleMenuClose = () => setAnchorEl(null);
+
+  const handleLogout = () => {
+    dispatch(clearUser());
+    handleMenuClose();
+  };
 
   const handleDeleteAccount = () => {
     setOpenDeleteDialog(true);
@@ -78,6 +82,10 @@ const UserMenu = () => {
           <Typography variant="body2">התחרויות שלי</Typography>
         </MenuItem>
 
+        <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+          <Typography variant="body2">התנתק</Typography>
+        </MenuItem>
+
         <MenuItem onClick={handleDeleteAccount} sx={{ color: 'error.main' }}>
           <Typography variant="body2">מחק חשבון</Typography>
         </MenuItem>
@@ -113,6 +121,7 @@ const UserMenu = () => {
           <Button onClick={() => setOpenDeleteDialog(false)} color="primary" variant="outlined">
             בטל
           </Button>
+
           <Button onClick={confirmDeleteAccount} color="error" variant="contained">
             מחק חשבון
           </Button>
