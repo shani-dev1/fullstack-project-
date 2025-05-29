@@ -5,11 +5,11 @@ import {
   CardMedia,
   Typography,
   Snackbar,
-  Alert
+  Alert,
 } from "@mui/material";
-import { Rate, Tag } from "antd";
+import { Button, Rate, Tag } from "antd";
 import { CompetitionItem } from "../competitionsTypes";
-import { useUpdateCompetitionRatingMutation } from "../competitionsAPI";
+import { useDeleteCompetitionMutation, useUpdateCompetitionRatingMutation } from "../competitionsAPI";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../auth/currentUserSlice";
 
@@ -20,6 +20,7 @@ interface Props {
 const CompetitionCard = ({ competitionItem }: Props) => {
   const [value, setValue] = useState<number | null>(null);
   const [updateCompetitionRating] = useUpdateCompetitionRatingMutation();
+  const [deleteCompetition] = useDeleteCompetitionMutation();
   const currentUser = useSelector(selectCurrentUser);
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -50,7 +51,7 @@ const CompetitionCard = ({ competitionItem }: Props) => {
         competitionId: competitionItem._id,
         rating: newValue,
         userId: currentUser._id,
-        category: competitionItem.category // ✅ הכרחי כדי ש-invalidatesTags יעבוד
+        category: competitionItem.category
       }).unwrap();
 
       setSnackbarMessage("הדירוג עודכן בהצלחה");
@@ -89,6 +90,29 @@ const CompetitionCard = ({ competitionItem }: Props) => {
           style={{ height: 200, objectFit: "cover" }}
         />
         <CardContent>
+
+
+        {currentUser && currentUser._id === competitionItem.ownerId && (
+           <Button
+            onClick={async () => {
+              try {
+                await deleteCompetition(competitionItem._id).unwrap();
+                setSnackbarMessage("התחרות נמחקה בהצלחה");                  setSnackbarSeverity("success");
+                 setOpenSnackbar(true);
+              } catch (error: any) {
+                setSnackbarMessage("שגיאה במחיקת התחרות");
+                setSnackbarSeverity("error");
+                setOpenSnackbar(true); 
+               }
+            }}
+          >
+            🗑️
+          </Button>
+        )}
+
+
+
+
           <Typography
             variant="h6"
             style={{ color: "#ffc107", fontWeight: "bold", fontSize: "18px" }}
