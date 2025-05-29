@@ -25,33 +25,39 @@ const competitionsAPI = competitionSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Competition" }],
     }),
-    
+
+    getUserCompetitionsByUserId: builder.query<CompetitionItem[], string>({
+      query: (userId) => `/UserCompetitions/${userId}`,
+      providesTags: (result, error, userId) => [{ type: "Competition", id: userId }],
+    }),
+    deleteCompetition: builder.mutation<void, string>({
+      query: (competitionId) => ({
+        url: `/${competitionId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Competition"],
+    }),
+
     updateCompetitionRating: builder.mutation({
       query: ({ competitionId, rating, userId }) => ({
         url: `/update/${competitionId}`,
         method: "PUT",
         body: { rating, userId },
       }),
-      
       invalidatesTags: (_result, _error, { category }) => [
         { type: "Competition", id: category },
         { type: "TopCompetitions", id: category },
       ],
     }),
-
-    getUserCompetitionsByUserId: builder.query<CompetitionItem[], string>({
-      query: (userId) => `/UserCompetitions/${userId}`,
-      providesTags: (_result, _error, userId) => [{ type: "Competition", id: userId }],
-    }),
   }),
 })
-
 export const {
   useGetCompetitionByCategoryQuery,
   useGetLeadCompetitionsByCategoryQuery,
   useCreateCompetitionMutation,
   useUpdateCompetitionRatingMutation,
   useGetUserCompetitionsByUserIdQuery,
+  useDeleteCompetitionMutation
 } = competitionsAPI;
 
-export default competitionsAPI;
+export default competitionsAPI
