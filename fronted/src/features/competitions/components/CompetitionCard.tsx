@@ -1,15 +1,9 @@
-import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  Snackbar,
-  Alert,
-} from "@mui/material";
+import { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
+import { Card, CardContent, CardMedia, Typography, Snackbar, Alert } from "@mui/material";
 import { Button, Rate, Tag } from "antd";
 import { CompetitionItem } from "../competitionsTypes";
-import { useDeleteCompetitionMutation, useUpdateCompetitionRatingMutation, useGetCompetitionByCategoryQuery } from "../competitionsAPI"; // הוסף את ה-hook כאן
+import { useDeleteCompetitionMutation, useUpdateCompetitionRatingMutation, useGetCompetitionByCategoryQuery } from "../competitionsAPI";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../auth/currentUserSlice";
 
@@ -22,14 +16,25 @@ const CompetitionCard = ({ competitionItem }: Props) => {
   const [updateCompetitionRating] = useUpdateCompetitionRatingMutation();
   const [deleteCompetition] = useDeleteCompetitionMutation();
   const currentUser = useSelector(selectCurrentUser);
-
-  const { refetch } = useGetCompetitionByCategoryQuery(competitionItem.category); // הוסף את השורה הזו
-
+  const { refetch } = useGetCompetitionByCategoryQuery(competitionItem.category);
+  
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "warning" | "error"
-  >("success");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "warning" | "error">("success");
+
+  const socket = io('http://localhost:3500'); // חיבור לשרת Socket.IO
+
+  useEffect(() => {
+    socket.on('competitionUpdate', (data) => {
+      if (data.action === 'create' || data.action === 'delete') {
+        refetch(); // רענן את הנתונים במקרה של יצירה או מחיקה
+      }
+    });
+
+    return () => {
+      socket.disconnect(); // נתק את החיבור כאשר הקומפוננטה מתנתקת
+    };
+  }, [socket, refetch]);
 
   const handleRatingChange = async (newValue: number) => {
     if (!currentUser) {

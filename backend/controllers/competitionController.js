@@ -38,7 +38,7 @@ exports.createCompetition = async (req, res) => {
     });
 
     await newCompetition.save();
-    
+    req.notifyClients('create', newCompetition); // השתמש ב-req.notifyClients
     res.status(201).json({ message: 'Competition created successfully', competition: newCompetition });
 
   } catch (error) {
@@ -111,6 +111,7 @@ exports.deleteCompetition = async (req, res) => {
     }
 
     await Competition.findByIdAndDelete(competitionId);
+    req.notifyClients('delete', { competitionId }); // השתמש ב-req.notifyClients
 
     res.status(200).json({ message: 'Competition and image deleted successfully' });
   } catch (error) {

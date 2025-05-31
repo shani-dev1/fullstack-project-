@@ -7,6 +7,7 @@ const competitionsAPI = competitionSlice.injectEndpoints({
       query: (category) => `/${category}`,
       providesTags: (_result, _error, category) => [
         { type: "Competition", id: category },
+        { type: "Competition", id: "ALL" }, // הוסף תג לכל התחרויות
       ],
     }),
 
@@ -30,12 +31,16 @@ const competitionsAPI = competitionSlice.injectEndpoints({
       query: (userId) => `/UserCompetitions/${userId}`,
       providesTags: (result, error, userId) => [{ type: "Competition", id: userId }],
     }),
+
     deleteCompetition: builder.mutation<void, string>({
       query: (competitionId) => ({
         url: `/${competitionId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Competition"],
+      invalidatesTags: (result, error, competitionId) => [
+        { type: "Competition", id: competitionId },
+        { type: "Competition", id: "ALL" }, // הוסף תג לכל התחרויות
+      ],
     }),
 
     updateCompetitionRating: builder.mutation({
@@ -51,6 +56,7 @@ const competitionsAPI = competitionSlice.injectEndpoints({
     }),
   }),
 })
+
 export const {
   useGetCompetitionByCategoryQuery,
   useGetLeadCompetitionsByCategoryQuery,
@@ -60,4 +66,4 @@ export const {
   useDeleteCompetitionMutation
 } = competitionsAPI;
 
-export default competitionsAPI
+export default competitionsAPI;
