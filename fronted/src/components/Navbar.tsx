@@ -22,13 +22,13 @@ import { useSelector } from 'react-redux';
 import AuthForm from '../features/auth/AuthForm';
 import { selectCurrentUser } from '../features/auth/currentUserSlice';
 import UserMenu from './UserMenue';
-import styles from './Navbar.styles'; // עדכן את הנתיב לפי הצורך
+import styles from './Navbar.styles';
 
 interface ScrollTopProps {
   children: ReactNode;
 }
 
-const ScrollTop=(props: ScrollTopProps) => {
+const ScrollTop = (props: ScrollTopProps) => {
   const { children } = props;
   const trigger = useScrollTrigger({
     disableHysteresis: true,
@@ -84,7 +84,7 @@ const Navbar = () => {
           <Container maxWidth="xl" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img
-                src="/logo.png" 
+                src="/logo.png"
                 alt="Logo"
                 style={{
                   height: 80,
@@ -134,7 +134,7 @@ const Navbar = () => {
         open={openLogin}
         onClose={() => setOpenLogin(false)}
         PaperProps={{
-          sx: styles.dialogPaper
+          sx: { ...styles.dialogPaper, maxHeight: '90vh', overflowY: 'auto', }
         }}
         maxWidth="sm"
         fullWidth
