@@ -1,163 +1,175 @@
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import { Button, Rate, Tag } from "antd";
-import { CompetitionItem } from "../competitionsTypes";
-import { useDeleteCompetitionMutation, useUpdateCompetitionRatingMutation, useGetCompetitionByCategoryQuery } from "../competitionsAPI"; // הוסף את ה-hook כאן
+import {Card, CardContent,CardMedia,Typography,Snackbar,Alert,Box,Chip,Rating,IconButton,} from "@mui/material";
+import {Person as PersonIcon,Star as StarIcon,Delete as DeleteIcon,} from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../auth/currentUserSlice";
+import { useUpdateCompetitionRatingMutation, useDeleteCompetitionMutation,
+} from "../competitionsAPI";
+import { CompetitionItem } from "../competitionsTypes";
+import { cardStyles,personIconStyles,personTextStyles,starIconStyles,chipRatingStyles,deleteButtonRight,
+deleteButtonLeft,cardMediaStyles,chipCategoryStyles,ratingBoxStyles,ratingTextStyles,ratingStyles,cardContentFlexStyles,snackbarStyles,} from "../styled/CompetitionCard.styles";
 
 interface Props {
   competitionItem: CompetitionItem;
+  onDelete?: (id: string) => void;
 }
 
-const CompetitionCard = ({ competitionItem }: Props) => {
+const CompetitionCard = ({ competitionItem, onDelete }: Props) => {
   const [value, setValue] = useState<number | null>(null);
-  const [updateCompetitionRating] = useUpdateCompetitionRatingMutation();
-  const [deleteCompetition] = useDeleteCompetitionMutation();
-  const currentUser = useSelector(selectCurrentUser);
-
-  const { refetch } = useGetCompetitionByCategoryQuery(competitionItem.category); // הוסף את השורה הזו
-
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<
     "success" | "warning" | "error"
   >("success");
 
-  const handleRatingChange = async (newValue: number) => {
-    if (!currentUser) {
-      setSnackbarMessage("עליך להתחבר כדי לדרג");
-      setSnackbarSeverity("warning");
-      setOpenSnackbar(true);
-      return;
-    }
+  const currentUser = useSelector(selectCurrentUser);
+  const [updateCompetitionRating] = useUpdateCompetitionRatingMutation();
+  const [deleteCompetition] = useDeleteCompetitionMutation();
 
-    if (currentUser._id === competitionItem.ownerId) {
-      setSnackbarMessage("בעל התחרות לא יכול לדרג את עצמו");
-      setSnackbarSeverity("warning");
-      setOpenSnackbar(true);
-      return;
-    }
+  const isOwner = currentUser?._id === competitionItem.ownerId;
+  const isExams = competitionItem.category === "exams";
 
-    setValue(newValue);
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "warning" | "error"
+  ) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setOpenSnackbar(true);
+  };
+
+  const submitRating = async (newValue: number) => {
+    if (!currentUser) return;
 
     try {
       await updateCompetitionRating({
         competitionId: competitionItem._id,
         rating: newValue,
         userId: currentUser._id,
-        category: competitionItem.category
+        category: competitionItem.category,
       }).unwrap();
 
-      setSnackbarMessage("הדירוג עודכן בהצלחה");
-      setSnackbarSeverity("success");
-      setOpenSnackbar(true);
+      showSnackbar("Rating updated successfully", "success");
     } catch (error: any) {
-      const errorMessage = error?.data?.message || "שגיאה בעדכון הדירוג";
-
+      const errorMessage = error?.data?.message || "Error updating rating";
       if (errorMessage === "User has already rated this competition") {
-        setSnackbarMessage("כבר דירגת את התחרות הזו. לא ניתן לדרג פעמיים.");
-        setSnackbarSeverity("warning");
+        showSnackbar(
+          "You have already rated this competition. You cannot rate it twice.",
+          "warning"
+        );
       } else {
-        setSnackbarMessage("שגיאה בעדכון הדירוג. אנא נסה שוב מאוחר יותר.");
-        setSnackbarSeverity("error");
+        showSnackbar("Error updating rating. Please try again later.", "error");
       }
-      setOpenSnackbar(true);
     }
   };
 
+  const handleRatingChange = async (
+    _: React.SyntheticEvent,
+    newValue: number | null
+  ) => {
+    if (!newValue) return;
+
+    if (!currentUser) {
+      showSnackbar("You must be logged in to rate", "warning");
+      return;
+    }
+
+    if (isOwner) {
+      showSnackbar("The owner of the competition cannot rate themselves", "warning");
+      return;
+    }
+
+    setValue(newValue);
+    await submitRating(newValue);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteCompetition(competitionItem._id).unwrap();
+      showSnackbar("Competition deleted successfully", "success");
+      onDelete?.(competitionItem._id);
+    } catch {
+      showSnackbar("Failed to delete competition", "error");
+    }
+  };
+
+  const renderCommonInfo = () => (
+    <>
+      <Box display="flex" alignItems="center" gap={1} mb={2}>
+        <PersonIcon sx={personIconStyles} />
+        <Typography variant="body2" sx={personTextStyles}>
+          {competitionItem.ownerEmail}
+        </Typography>
+      </Box>
+      <Box display="flex" alignItems="center" gap={1} mb={2}>
+        <StarIcon sx={starIconStyles} />
+        <Chip
+          label={`Rating: ${competitionItem.rating}`}
+          size="small"
+          sx={chipRatingStyles}
+        />
+      </Box>
+    </>
+  );
+
   return (
     <>
-      <Card
-        style={{
-          width: 320,
-          borderRadius: 16,
-          overflow: "hidden",
-          background: "#1f1f1f",
-          border: "1px solid #ffc107",
-          boxShadow: "0 6px 24px rgba(0,0,0,0.4)"
-        }}
-      >
-        <CardMedia
-          component="img"
-          alt="תמונה לתחרות"
-          image={competitionItem.fileUrl}
-          style={{ height: 200, objectFit: "cover" }}
-        />
-        <CardContent>
-          {currentUser && currentUser._id === competitionItem.ownerId && (
-            <Button
-              onClick={async () => {
-                try {
-                  await deleteCompetition(competitionItem._id).unwrap();
-                  refetch(); // רענן את הנתונים
+      <Card sx={cardStyles(isExams)}>
+        {isExams ? (
+          <CardContent sx={{ p: 3 }}>
+            {renderCommonInfo()}
+            {isOwner && (
+              <IconButton onClick={handleDelete} sx={deleteButtonRight}>
+                <DeleteIcon />
+              </IconButton>
+            )}
+          </CardContent>
+        ) : (
+          <>
+            <Box sx={{ position: "relative", height: 200 }}>
+              <CardMedia
+                component="img"
+                alt="Competition image"
+                image={competitionItem.fileUrl}
+                sx={cardMediaStyles}
+              />
+              <Chip label={competitionItem.category} sx={chipCategoryStyles} />
+              {isOwner && (
+                <IconButton onClick={handleDelete} sx={deleteButtonLeft}>
+                  <DeleteIcon />
+                </IconButton>
+              )}
+            </Box>
 
-                  setSnackbarMessage("התחרות נמחקה בהצלחה");
-                  setSnackbarSeverity("success");
-                  setOpenSnackbar(true);
-                } catch (error: any) {
-                  setSnackbarMessage("שגיאה במחיקת התחרות");
-                  setSnackbarSeverity("error");
-                  setOpenSnackbar(true); 
-                }
-              }}
-            >
-              🗑️
-            </Button>
-          )}
-          <Typography
-            variant="h6"
-            style={{ color: "#ffc107", fontWeight: "bold", fontSize: "18px" }}
-          >
-            קטגוריה: {competitionItem.category}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="textSecondary"
-            style={{ color: "#ccc", fontSize: "14px" }}
-          >
-            הועלה על ידי: {competitionItem.ownerEmail}
-          </Typography>
-          <br />
-          <Tag color="gold" style={{ marginTop: 8, fontSize: 14 }}>
-            ציון: {competitionItem.rating}
-          </Tag>
+            <CardContent sx={cardContentFlexStyles}>
+              <Box>{renderCommonInfo()}</Box>
 
-          <div
-            style={{
-              marginTop: 12,
-              backgroundColor: "#2a2a2a",
-              padding: "8px 12px",
-              borderRadius: "8px",
-              display: "inline-block"
-            }}
-          >
-            <Rate
-              allowClear
-              value={value ?? competitionItem.rating ?? 0}
-              onChange={handleRatingChange}
-              style={{ color: "#ffca28", fontSize: 24 }}
-            />
-          </div>
-        </CardContent>
+              <Box sx={ratingBoxStyles}>
+                <Typography variant="body2" sx={ratingTextStyles}>
+                  Rate this competition:
+                </Typography>
+                <Rating
+                  value={value ?? competitionItem.rating ?? 0}
+                  onChange={handleRatingChange}
+                  precision={0.5}
+                  sx={ratingStyles}
+                />
+              </Box>
+            </CardContent>
+          </>
+        )}
       </Card>
 
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
           onClose={() => setOpenSnackbar(false)}
           severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+          sx={snackbarStyles}
         >
           {snackbarMessage}
         </Alert>
@@ -165,5 +177,4 @@ const CompetitionCard = ({ competitionItem }: Props) => {
     </>
   );
 };
-
 export default CompetitionCard;
