@@ -1,4 +1,8 @@
+import { Box, Typography, Avatar, Chip } from '@mui/material';
+import { EmojiEvents as TrophyIcon } from '@mui/icons-material';
 import { CompetitionItem } from '../competitionsTypes';
+import { useParams } from 'react-router-dom';
+import { styles } from '../styled/LeadCompetitions.styles';
 
 interface Props {
   topCompetitions: CompetitionItem[];
@@ -8,40 +12,53 @@ interface Props {
 }
 
 const LeadCompetitions = ({ topCompetitions, onSelect, onMouseEnter, onMouseLeave }: Props) => {
+  const { competitionID } = useParams();
   return (
-    <div>
-      <div>המובילים שלנו</div>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '24px' }}>
-        {topCompetitions.map((competition, index) => (
-          <div
-            key={competition._id}
-            onClick={() => onSelect(competition)}
-            onMouseEnter={() => onMouseEnter(competition)}
-            onMouseLeave={onMouseLeave}
-            style={{
-              width: 100,
-              height: 100,
-              borderRadius: '50%',
-              backgroundImage: `url(${competition.fileUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              border: '3px solid gold',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold',
-              color: '#fff',
-              fontSize: 18,
-              position: 'relative',
-              transition: 'transform 0.3s ease',
-            }}
-          >
-            {index + 1}
-          </div>
-        ))}
-      </div>
-    </div>
+    <Box sx={styles.container}>
+      <Box sx={styles.headerBox}>
+        <TrophyIcon sx={styles.trophyIcon} />
+        <Typography variant="h5" sx={styles.headerTypography}>
+          Our Top Competitors
+        </Typography>
+        <TrophyIcon sx={styles.trophyIcon} />
+      </Box>
+
+      <Box sx={styles.competitionsWrapper}>
+        {topCompetitions.slice(0, 3).map((competition, index) => {
+          const isExams = competitionID === 'exams';
+
+          if (isExams) {
+            return (
+              <Box key={competition._id} sx={styles.examBoxContainer}>
+                <Box sx={styles.examAvatarWrapper(index)}>
+                  <Avatar src={competition.fileUrl} sx={styles.examAvatar} />
+                  <Box sx={styles.examBadge} />
+                </Box>
+                <Typography sx={styles.examRating}>
+                  {competition.rating ?? 'N/A'}
+                </Typography>
+                <Typography sx={styles.examEmail}>
+                  {competition.ownerEmail}
+                </Typography>
+              </Box>
+            );
+          }
+
+          return (
+            <Box
+              key={competition._id}
+              onClick={() => onSelect(competition)}
+              onMouseEnter={() => onMouseEnter(competition)}
+              onMouseLeave={onMouseLeave}
+              sx={styles.competitionBox(index)}
+            >
+              <Avatar src={competition.fileUrl} sx={styles.competitionAvatar(index)} />
+              <Chip label={index + 1} sx={styles.chip(index)} />
+            </Box>
+          );
+        })}
+      </Box>
+    </Box>
   );
 };
 
