@@ -10,11 +10,13 @@ const competitionRoutes = require('./routes/competitionRoutes');
 const questionRoutes = require('./routes/questionRoutes');
 const setupSocket = require('./socket');
 
+const corsOptions = require('./config/corsOptions'); 
+
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5050;
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 mongoose.connect(process.env.CONECTION_URL)
