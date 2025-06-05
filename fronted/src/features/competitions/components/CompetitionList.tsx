@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import {  Box,Typography, Container,  CircularProgress, Alert,  Grid} from '@mui/material';
 import {  useGetCompetitionByCategoryQuery, useGetLeadCompetitionsByCategoryQuery,} from '../competitionsAPI';
 import CompetitionCard from './CompetitionCard';
 import TopCompetitions from './LeadCompetitions';
 import { CompetitionItem } from '../competitionsTypes';
 import { loaderBoxStyle, loaderStyle, errorAlertContainer, pageContainerStyle, fixedLabelBox, fixedLabelText, popupCardBox} from '../styled/CompetitionList.styles';
+import { selectCurrentCompetition } from '../competitionsStateSlice';
+import { useSelector } from 'react-redux';
 
 const CompetitionList =() =>{
-  const { competitionID } = useParams<{ competitionID: string }>();
+  const competitionID = useSelector(selectCurrentCompetition);
   const { data,error, isLoading,} = useGetCompetitionByCategoryQuery(competitionID || '');
   const {
     data: topCompetitions,

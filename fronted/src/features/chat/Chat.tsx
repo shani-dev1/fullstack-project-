@@ -33,7 +33,6 @@ import {
   StyledTextField,
 } from './Chat.styles';
 
-alert(5555555)
 const normalize = (str: string | undefined | null): string =>
   (str || '').trim().toLowerCase();
 

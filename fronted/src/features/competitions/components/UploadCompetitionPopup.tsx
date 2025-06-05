@@ -3,7 +3,7 @@ import { selectCurrentUser } from "../../auth/currentUserSlice";
 import { Dialog,DialogActions, DialogContent, DialogTitle, Button, Box, Typography,
  Snackbar,Alert,CircularProgress,Paper,} from "@mui/material";
 import { CloudUpload as UploadIcon, Close as CloseIcon } from "@mui/icons-material";
-import { useParams } from "react-router-dom";
+import { selectCurrentCompetition } from '../competitionsStateSlice';
 import { useCreateCompetitionMutation } from "../competitionsAPI";
 import { useState } from "react";
 import { styles } from "../styled/UploadCompetitionPopup.styles";
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const UploadCompetitionPopup = ({ onClose, onSuccess }: Props) => {
-  const { competitionID } = useParams();
+  const competitionID = useSelector(selectCurrentCompetition);
   const [uploadCompetition, { isLoading }] = useCreateCompetitionMutation();
   const currentUser = useSelector(selectCurrentUser);
 

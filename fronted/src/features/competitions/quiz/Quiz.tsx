@@ -8,7 +8,7 @@ import {PlayArrow as PlayIcon, Star as StarIcon, Quiz as QuizIcon, CheckCircle a
 import { useCreateCompetitionMutation, useGenerateQuestionMutation } from '../competitionsAPI';
 import { selectCurrentUser } from "../../auth/currentUserSlice";
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { selectCurrentCompetition } from '../competitionsStateSlice';
 import {
     setTopic, setQuestionText, setOptions, setCorrectAnswer, setSelectedAnswer, setResult, incrementQuestionsAsked,
     setScore, setQuizFinished, setShowResult, setIsProcessing, resetQuizState, clearCurrentQuestion, selectQuizState
@@ -28,7 +28,7 @@ const Quiz = () => {
     const currentUser = useSelector(selectCurrentUser);
     const [uploadCompetition] = useCreateCompetitionMutation();
     const [generateQuestion, { isLoading, data, error, reset }] = useGenerateQuestionMutation();
-    const { competitionID } = useParams<{ competitionID: string }>();
+  const competitionID = useSelector(selectCurrentCompetition);
 
     const [notification, setNotification] = useState<NotificationState>({
         open: false,
