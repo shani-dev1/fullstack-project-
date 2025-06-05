@@ -4,8 +4,8 @@ import { Add as AddIcon, Chat as ChatIcon, Close as CloseIcon, School as SchoolI
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../auth/currentUserSlice";
+import { selectCurrentCompetition } from '../competitionsStateSlice';
 import { useGetCompetitionByCategoryQuery } from "../competitionsAPI";
-import { useParams } from "react-router-dom";
 import UploadCompetitionPopup from "./UploadCompetitionPopup";
 import Chat from '../../chat/Chat';
 
@@ -14,10 +14,10 @@ import Quiz from "../quiz/Quiz";
 
 const ShowCompetition = () => {
 
-  const { competitionID } = useParams<{ competitionID: string }>();  
+  const competitionID = useSelector(selectCurrentCompetition);
   const user = useSelector(selectCurrentUser);
 
-  const { refetch } = useGetCompetitionByCategoryQuery(competitionID || '');
+  const { refetch } = useGetCompetitionByCategoryQuery(competitionID);
 
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
   const [isQuizOpen, setIsQuizOpen] = useState<boolean>(false);

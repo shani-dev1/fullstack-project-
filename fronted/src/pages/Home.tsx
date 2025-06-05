@@ -17,6 +17,8 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import SchoolIcon from '@mui/icons-material/School';
 import { useEffect, useState } from "react";
 import styles from './Home.styles';
+import { useDispatch } from "react-redux";
+import { chooseCompetition } from '../features/competitions/competitionsStateSlice';
 
 const categoryData: Record<CategoryKeys, {
   label: string;
@@ -47,6 +49,13 @@ const categoryData: Record<CategoryKeys, {
 const Home = () => {
   const [animate, setAnimate] = useState<boolean>(false);
 
+  const dispatch = useDispatch(); 
+
+  const handleCompetitionChange = (key: CategoryKeys) => { 
+    dispatch(chooseCompetition(key));
+  };
+
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimate(true);
@@ -73,10 +82,10 @@ const Home = () => {
 
         <Grid container spacing={4} sx={styles.categoryGrid}>
           {Object.entries(categoryData).map(([key, { label, icon, description, color }], index) => (
-            <Grid item xs={12} sm={6} md={4} key={key}>
+              <Grid item component={Link} to={`/competitions/${key}`} xs={12} sm={6} md={4} key={key}>
               <Zoom in={animate} style={{ transitionDelay: `${index * 200}ms` }}>
                 <Card sx={styles.categoryCard}>
-                  <CardActionArea component={Link} to={`/competitions/${key}`}>
+                  <CardActionArea onClick={()=>handleCompetitionChange(key as CategoryKeys)} component={Link} to={`/competitions/${key}`}>
                     <Box sx={styles.cardMedia}>
                       <Box
                         sx={{

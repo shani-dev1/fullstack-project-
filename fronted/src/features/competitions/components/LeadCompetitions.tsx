@@ -1,8 +1,9 @@
 import { Box, Typography, Avatar, Chip } from '@mui/material';
 import { EmojiEvents as TrophyIcon } from '@mui/icons-material';
 import { CompetitionItem } from '../competitionsTypes';
-import { useParams } from 'react-router-dom';
+import { selectCurrentCompetition } from '../competitionsStateSlice';
 import { styles } from '../styled/LeadCompetitions.styles';
+import { useSelector } from 'react-redux';
 
 interface Props {
   topCompetitions: CompetitionItem[];
@@ -12,7 +13,7 @@ interface Props {
 }
 
 const LeadCompetitions = ({ topCompetitions, onSelect, onMouseEnter, onMouseLeave }: Props) => {
-  const { competitionID } = useParams();
+  const competitionID = useSelector(selectCurrentCompetition);
   return (
     <Box sx={styles.container}>
       <Box sx={styles.headerBox}>
