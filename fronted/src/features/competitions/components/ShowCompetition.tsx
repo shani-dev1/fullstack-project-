@@ -8,12 +8,13 @@ import { useGetCompetitionByCategoryQuery } from "../competitionsAPI";
 import { useParams } from "react-router-dom";
 import UploadCompetitionPopup from "./UploadCompetitionPopup";
 // import Chat from '../../chat/Chat';
-// import Quiz from '../../quiz/Quiz';  
 
 import { styles } from '../styled/ShowCompetition.styles';  
+import Quiz from "../quiz/Quiz";
 
 const ShowCompetition = () => {
-  const { competitionID } = useParams<{ competitionID: string }>();
+
+  const { competitionID } = useParams<{ competitionID: string }>();  
   const user = useSelector(selectCurrentUser);
 
   const { refetch } = useGetCompetitionByCategoryQuery(competitionID || '');
@@ -100,7 +101,7 @@ const ShowCompetition = () => {
 
       <Modal open={isQuizOpen} onClose={() => setIsQuizOpen(false)}>
         <Box sx={styles.quizModalBox}>
-          {/* <Quiz /> */}
+          <Quiz/>
         </Box>
       </Modal>
 

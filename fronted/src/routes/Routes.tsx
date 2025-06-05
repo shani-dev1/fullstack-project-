@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router";
 import Home from "../pages/Home";
 import AppLayout from "../components/AppLayout";
-import CompetitionList from "../features/competitions/components/CompetitionList";
 import About from "../pages/About";
+import ShowCompetition from "../features/competitions/components/ShowCompetition";
 
 const router = createBrowserRouter([
     {
@@ -12,7 +12,7 @@ const router = createBrowserRouter([
                 index: true,
                 element: <Home/>                
             },
-            { path: "competitions/:competitionID", element: <CompetitionList/> },
+            { path: "competitions/:competitionID", element: <ShowCompetition/> },
             { path: "about", element: <About /> },
         ]
     }  

@@ -160,7 +160,7 @@ const Navbar = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <AuthForm /> {/* הסר את המאפיין onSuccess */}
+          <AuthForm />
         </DialogContent>
       </Dialog>
 
