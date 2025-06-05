@@ -40,7 +40,7 @@ exports.createCompetition = async (req, res) => {
     });
 
     await newCompetition.save();
-    
+    await User.findByIdAndUpdate(ownerId, { $addToSet: { rooms: category } });    
     res.status(201).json({ message: 'Competition created successfully', competition: newCompetition });
 
   } catch (error) {

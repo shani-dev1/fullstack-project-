@@ -18,14 +18,16 @@ exports.addUser = async (req, res) => {
     }
 
     const hashedPwd = await bcrypt.hash(password, 10);
-    const userObject = { _id, name, email, phone, password: hashedPwd };
+    const userObject = { _id, name, email, phone, password: hashedPwd, rooms: [] };
     const user = await User.create(userObject);
 
     if (user) {
+      
       const userInfo = {
         name: user.name,
         email: user.email,
         _id: user._id,
+        rooms:[],
       };
 
       const token = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET);
@@ -42,17 +44,16 @@ exports.addUser = async (req, res) => {
 };
 
 exports.deleteUser = async (req, res) => {
-  
-    const userId = req.params.userId;
-    try {
-      const deletedUser = await User.findOneAndDelete({ _id: userId });
-      if (!deletedUser) {
-        console.log("deleteUser");
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.json({ message: 'User deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ message: 'Failed to delete user' });
+
+  const userId = req.params.userId;
+  try {
+    const deletedUser = await User.findOneAndDelete({ _id: userId });
+    if (!deletedUser) {
+      console.log("deleteUser");
+      return res.status(404).json({ message: 'User not found' });
     }
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete user' });
+  }
 };
-  
