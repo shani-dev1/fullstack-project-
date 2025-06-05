@@ -19,9 +19,10 @@ exports.signIn = async (req, res) => {
         }
 
         const userInfo = {
-            name: foundUser.name,
+            name: "name"+foundUser.email,
             email: foundUser.email,
-            _id: foundUser._id
+            _id: foundUser._id,
+            rooms: foundUser.rooms || [],
         };
 
         const token = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET);
@@ -33,4 +34,3 @@ exports.signIn = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
-

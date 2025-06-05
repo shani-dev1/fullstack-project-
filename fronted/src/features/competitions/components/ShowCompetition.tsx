@@ -7,7 +7,7 @@ import { selectCurrentUser } from "../../auth/currentUserSlice";
 import { useGetCompetitionByCategoryQuery } from "../competitionsAPI";
 import { useParams } from "react-router-dom";
 import UploadCompetitionPopup from "./UploadCompetitionPopup";
-// import Chat from '../../chat/Chat';
+import Chat from '../../chat/Chat';
 
 import { styles } from '../styled/ShowCompetition.styles';  
 import Quiz from "../quiz/Quiz";
@@ -35,10 +35,10 @@ const ShowCompetition = () => {
     }
 
     const currentCompetitionID = competitionID || '';
-    // if (!user.rooms || !user.rooms.includes(currentCompetitionID)) {
-    //   alert('You do not have access to this chat room');
-    //   return;
-    // }
+    if (!user.rooms || !user.rooms.includes(currentCompetitionID)) {
+      alert('You do not have access to this chat room');
+      return;
+    }
 
     setShowChatPopup(true);
   };
@@ -114,7 +114,7 @@ const ShowCompetition = () => {
           </Box>
 
           <Box sx={styles.chatContentBox}>
-            {/* <Chat category={competitionID || ''} onClose={() => setShowChatPopup(false)} /> */}
+            <Chat category={competitionID || ''} onClose={() => setShowChatPopup(false)} />
           </Box>
         </Paper>
       )}
