@@ -13,3 +13,9 @@ export interface Category {
   exams: string;
 }
 export type CategoryKeys = keyof Category;
+
+export interface QuestionData {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+}

@@ -18,15 +18,17 @@ exports.getCompetitionsByCategory = async (req, res) => {
 };
 
 exports.createCompetition = async (req, res) => {
+  
   try {
     const { ownerId, category, ownerEmail } = req.body;
 
-    if (!req.file || !req.file.path) {
-      return res.status(400).json({ message: 'Image upload failed' });
-    }
+    let fileUrl=null;
+    let publicId=null;
 
-    const fileUrl = req.file.path;
-    const publicId = getPublicIdFromUrl(fileUrl); 
+    if(req.file){
+        fileUrl = req.file.path;
+        publicId = getPublicIdFromUrl(fileUrl); 
+    }
 
     const newCompetition = new Competition({
       ownerId,

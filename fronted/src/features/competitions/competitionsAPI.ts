@@ -1,5 +1,5 @@
 import competitionSlice from "./competitionSlice";
-import { CompetitionItem } from "./competitionsTypes";
+import { CompetitionItem, QuestionData } from "./competitionsTypes";
 
 const competitionsAPI = competitionSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -49,6 +49,16 @@ const competitionsAPI = competitionSlice.injectEndpoints({
         { type: "TopCompetitions", id: category },
       ],
     }),
+
+    generateQuestion: builder.mutation<QuestionData, { topic: string }>({
+      query: ({ topic }) => ({
+        url: '/generate-question',
+        method: 'POST',
+        body: {
+          prompt: `Write a multiple-choice question about ${topic} with 4 answers in the format: A), B), C), D). At the end of the question, add a line with (Correct answer: <letter>)`,
+        },
+      }),
+    }),
   }),
 })
 export const {
@@ -57,7 +67,8 @@ export const {
   useCreateCompetitionMutation,
   useUpdateCompetitionRatingMutation,
   useGetUserCompetitionsByUserIdQuery,
-  useDeleteCompetitionMutation
+  useDeleteCompetitionMutation,
+  useGenerateQuestionMutation
 } = competitionsAPI;
 
 export default competitionsAPI
