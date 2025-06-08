@@ -19,7 +19,7 @@ exports.signIn = async (req, res) => {
         }
 
         const userInfo = {
-            name: "name"+foundUser.email,
+            name: foundUser.name,
             email: foundUser.email,
             _id: foundUser._id,
             rooms: foundUser.rooms || [],
