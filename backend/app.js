@@ -21,17 +21,22 @@ app.use(express.json());
 
 mongoose.connect(process.env.CONECTION_URL)
   .then(() => {
-    console.log('MongoDB connected')
+    console.log('MongoDB connected');
+
     const server = http.createServer(app);
     setupSocket(server);
+
+      server.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+
+    app.use('/api/users', userRoutes);
+    app.use('/api/auth', authRoutes);
+    app.use('/api/competitions', competitionRoutes);
+    app.use('/api/competitions', questionRoutes);
+
   })
-  .catch(err => console.error('MongoDB connection error:', err));
-
-app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/competitions', competitionRoutes);
-app.use('/api/competitions', questionRoutes);
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
