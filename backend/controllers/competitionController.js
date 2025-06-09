@@ -1,5 +1,7 @@
 const Competition = require('../models/competition');
 const { cloudinary } = require('../config/cloudinary');
+const { required } = require('../models/users');
+const User = require('../models/users')
 
 exports.getCompetitionsByCategory = async (req, res) => {  
   const { category } = req.params;
@@ -17,23 +19,26 @@ exports.getCompetitionsByCategory = async (req, res) => {
   }
 };
 
-exports.createCompetition = async (req, res) => {
-  
+exports.createCompetition = async (req, res) => {    
   try {
     const { ownerId, category, ownerEmail } = req.body;
-
+        
     let fileUrl=null;
     let publicId=null;
+    let rating = 0;
 
     if(req.file){
         fileUrl = req.file.path;
         publicId = getPublicIdFromUrl(fileUrl); 
     }
 
+    if ('rating' in req.body) 
+      rating = req.body.rating
+
     const newCompetition = new Competition({
       ownerId,
       category,
-      rating: 0,
+      rating,
       ownerEmail,
       fileUrl,
       publicId 
