@@ -10,7 +10,7 @@ export const useSocket = ({ category, onUnauthorized }: UseSocketParams) => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const socketInstance = io('http://localhost:3000');
+    const socketInstance = io('http://localhost:3500');
 
     socketInstance.emit('joinRoom', { category });
 
